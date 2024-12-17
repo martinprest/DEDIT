@@ -1,0 +1,36 @@
+DYdel:(dp%,sz%)
+rem delete a diary record at dp%, length sz%
+local mc%(7),tmp%,start%
+rem local da%
+
+rem da%=peekw($2004) rem diary address
+rem print"diary: $";hex$(da%)
+rem sz%=peekb(da%+dp%) rem read size of record at diary pointer dp%
+
+rem * OS al$shrink to delete record from diary cell
+rem * shrink diary cell by sz% bytes at dp%
+
+rem utw_s0 <- dp%, store dp% at utw_s0
+rem D loaded by OPL usr(), with dp%
+mc%(1)=$DD41 rem STD $41 store D in $41 $42 (utw_s0) offset location dp%
+
+rem D <- sz%
+mc%(2)=$01CC rem NOP :LDD #
+mc%(3)=sz% rem sz%
+
+rem X <- diary cell, call al$shrink to shrink by sz% at dp%
+mc%(4)=$01CE rem NOP LDX #
+mc%(5)=$2004 rem $2004 diary tag
+mc%(6)=$3F04 rem OS al$shrink, X=diary tag, D=sz%, location utw_s0=dp%
+mc%(7)=$3901 rem RTS :NOP
+rem utw_s0-3 trashed by OS call, (D=value in addr(X), X=$2040)
+rem on exit X=$2040, contents of X in D, $2040 is pointer to end of allocator area, end of last cell
+rem so nothing particularly useful is returned by al$shrink in X or D
+
+start%=addr(mc%())
+rem print"c:$";hex$(start%),"D:$";hex$(dp%); :get rem ** for debug
+rem print"r" rem to indicate run
+
+tmp%=usr(start%,dp%) rem usr(x%,y%) y% into D, call mc at x%, return X
+rem tmp%=$2040, pointer to end of allocator cells
+return

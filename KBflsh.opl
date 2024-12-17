@@ -1,0 +1,12 @@
+KBflsh:
+rem flush keyboard buffer using os call
+local mc%(2),tmp%
+
+rem * OS kb$flsh to flush keyboar buffer
+
+mc%(1)=$3F47 :rem os kb$flsh $3F47
+mc%(2)=$3901 :rem rts $39 :NOP $01
+
+tmp%=usr(addr(mc%()),0) rem usr(x%,y%) put val at y% into D, call mc at x%, return X
+
+return

@@ -1,0 +1,62 @@
+DYadd:(dp%,rec$)
+rem add a diary record, rec$ at dp%
+local tag%,da%,start%,rec%,error%,ea%,mc%(9),rec2$(71)
+tag%=$2004 rem pointer to diary allocator cell
+da%=peekw(tag%) rem diary address
+rem print"diary: $";hex$(da%)
+start%=addr(mc%())
+rec2$=rec$ rem can't use addr() on external variable!
+rec%=addr(rec2$)+1 rem addr to store diary record, 1st byte is length
+
+rem OS al$grow to make space for record
+rem OS ut$cpyb to add rec$ to diary
+
+rem utw_s0 <- dp%, store dp% at utw_s0
+rem D loaded by OPL usr(), move to X
+mc%(1)=$18CC rem XGDX D->X :LDD #
+mc%(2)=dp% rem dp%
+mc%(3)=$DD41 rem STD $41 store D in $41 $42 (utw_s0) offset location dp%
+
+rem D <- len(rec$)
+mc%(4)=$01CC rem NOP :LDD#
+rem mc%(5)=1000 rem big record for memory test
+mc%(5)=len(rec$)
+
+rem X <- diary cell
+rem * OS al$grow to grow by length(rec$) at dp%
+mc%(6)=$3F02 rem OS al$grow grow diary cell by length of record, X=tag of diary cell, D=record length, utw_s0=offset location dp%
+mc%(7)=$2501 rem BCS +1 if error skip clear D - checks for out of memory!
+mc%(8)=$5F4F rem CLRB :CLRA clear D
+mc%(9)=$1839 rem XGDX D->X return x :RTS returns 0 if ok
+
+rem print"c:$";hex$(start%),"D:$";hex$(tag%); :get
+rem print"r"
+
+error%=usr(addr(mc%()),tag%) rem usr(x%,y%) y% into D, call mc at x%, return X
+if error%>0 :goto error:: :endif
+
+rem * insert record at diary pointer da%+dp%
+rem * X=source rec%=addr(rec$)+1, D=dest da%+dp%, utw_s0=length
+mc%(1)=$18CC rem XGDX D->X :LDD #
+mc%(2)=len(rec$)
+mc%(3)=$DD41 rem STD $41 store D in addr $41 $42 (utw_s0) number of bytes to copy
+
+rem D <- da%+dp%, destination
+mc%(4)=$01CC rem NOP :LDD #
+mc%(5)=da%+dp%
+
+rem * OS ut$cpyb to add rec$
+mc%(6)=$3F6D rem OS ut$cpyb copy utw_s0 (len(rec$)) bytes from X (addr(rec$)) to D (da%+dp%), ** returns end dest of move in D **
+mc%(7)=$1839 rem XGDX :RTS D->X (return end dest)
+
+rem print"c:$";hex$(start%),"D:$";hex$(rec%); :get
+rem print"r"
+
+ea%=usr(start%,rec%)
+return ea% rem ea%=end address
+
+error::
+print"add error:",error% 
+print err$(error%) rem 254 = "out of memory"
+get 
+return 0

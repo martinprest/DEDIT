@@ -1,0 +1,523 @@
+
+Psion Organiser II DEDIT for XP an CM - A Diary editing tool
+------------------------------------------------------------
+Martin Prest, Dec-2024
+
+BITS OF USEFUL INFO COPIED AND PASTED FROM OTHER PLACES
+-------------------------------------------------------
+
+Diary allocator cell
+--------------------
+
+LYMDHMA Length,Year,Month,Day,Hour,Minute,Alarm
+0123456
+
+dirycell	$2004/05		Diary cell. Each diary item consists of:
+0: Length byte. Contains length of the text of the diary entry.
+1: Year (0-99 on CM/XP, 0-255 on LZ)
+2: Month (0-11)
+3: Day (0-30)
+4: Hour (0-23)
+5: Minutes (0 or 30 on CM/XP, 0,15,30,45 on LZ)
+6: Alarm, 0=no alarm, else one more than the number of minutes before the given time it will sound.
+This is followed by the text of the diary entry, its length byte is byte 0 above.
+The list of diary entries is terminated by a zero byte.
+
+From CM/XP manual
+-----------------
+
+keep your diary entries short. The maximum length is 64 characters
+
+From LZ prog manual - diary records are different & longer on the LZ !!
+-------------------
+
+Diary files
+Diary files are saved as data files. Each entry is a record with this two field format:
+
+1989042712000100    
+JAMES BIRTHDAY      
+
+in this example, the first field carries this information:
+
+1989	The year
+04	The month
+27	The date
+1200	The start time
+01	The duration - one 15 minute interval
+00	The alarm pre-warning time. In this case there is no alarm so it's zero.
+You can open a saved diary file in Xfiles, and then find and update records in it. For example, you could find all your annual entries such as birthdays and change 1989 to 1990. If you then restored the diary and merged it with the current one you wouldn't need to put in all the birthday entries again at the end of the year. However, be careful to use the right format, or you won't be able to restore the diary.
+
+You could also do this in OPL using the data file handling and string handling commands. There is a program in Chapter 8 which does this.
+
+
+
+Paul Robson Emulator
+--------------------
+
+Psion Organiser II emulator with built in debugger for assembler and machine code
+
+org2dev for XP
+org2lz64 for LZ64
+
+Coding Flow
+-----------
+
+translate, build and run using these 3 commands at the DOS prompt:
+atran @files -x
+makepack pack.bld
+org2
+
+pack.bld example:
+PACK 32
+dyedit OB3 ! main proc
+dyread$ OB3 ! reads diary record
+dyadd OB3 ! adds a diary record
+
+Keys - Full screen Organiser display
+====
+
+F1        is On/Clr
+F2        is Mode
+F10       is Enter the Debugger
+Backspace is Del
+Enter     is Exe
+
+Use OFF (O) to exit full screen mode and save a snapshot of Organiser main 
+memory to be restored at next run.
+
+The other keys are the obvious ones (A-Z Space and Enter)
+
+Other "numeric" chars such as $," etc. by shifting the correct alpha key
+as if on organiser, having a real organiser or picture helps here.
+
+
+Debugger Commands
+-----------------
+F1      Set Break
+F2      Resynchronise System
+F3      Run to LCD Write
+F5      Run normally (with the big screen)
+F7      Step through
+F8      Single Step
+F9      Run to Break
+HOME    Back to PC
+0-9A-F  Change Program Address
++Ctrl   Change Data Address
+ESC     Exit emulator (does *NOT* save RAM)
+
+Status register:
+--HINZVC
+H-half carry
+I-interruppt mask
+N-negative
+Z-zero
+V-overflow
+C-carry
+
+Z is set if any instruction causes A or B to be zero
+
+use OPL code to print code address during run, just before running mc - press F10- debugger, move to that address, press F1, then F9
+
+If using Dosbox - CTRL-F10 to release mouse
+
+when code addr printed press F10
+enter code addr, pree F1 for breakpoint
+press F9 to continue execution, press a key, prints"r"
+single step with F8
+
+
+JAPE
+----
+
+If using JAPE emulator, use bldpack instead of makepack to prevent error messages (OPK files vary in length)
+
+
+Useful OPL
+----------
+
+USR
+Syntax: u%=USR(x%,y%)
+The value of y% is passed to the D register and the value of x% is passed to the PC register of the HD6303X microprocessor. 
+The microprocessor then executes the machine language program starting at the address x%. 
+At the end of the routine, the value in the X register is passed back to the language as an integer.
+Warning: Casual use of this function can result in the loss of all data in the Organiser.
+See also USR$, ADDR.
+
+USR$
+Syntax: u$=USR$(x%,y%)
+The value of y% is passed to the D register and the value of x% is passed to the PC register of the HD6303X microprocessor. 
+The microprocessor then executes the machine language program starting at the address x%. 
+At the end of the routine, the value in the X register must point to a length-byte preceded string. This string is then returned.
+Warning: Casual use of this function can result in the loss of all data in the Organiser.
+See also USR, ADDR.
+
+The microprocessor executes the machine language program starting at the address x%. 
+The other parameter of USR (y%) allows you to pass an integer value to the machine code program. 
+This value is in the register D when the machine code starts. (The X register will have x%)
+The high and low bytes of D are usually called A and B. (A has MSB)
+
+The outcome of a machine code routine which is in the D register can be put into the X register using the XGDX instruction which swaps the values of X and D.
+It is only the value of X which is returned to the OPL program.
+
+
+Machine code tips
+-----------------
+
+Processor is Hitachi HD6303X, similar to the Motorola 6800 (closer to 6801), but with expanded instruction set, LDD & STD etc.
+However, there's lots more info available for 6800 on the web, eg:
+http://www.8bit-era.cz/6800.html
+
+Registers: 
+A 8 bit
+B 8 bit
+D 16 bit, from A and B, A-high, B-low
+X 16 bit
+
+Addressing modes:
+r	Relative jump (1 byte)
+d	1 byte offset added to X to refer to a memory address (indexed addressing)
+#	1 byte immediate value
+##	2 byte immediate value
+0m	1 byte zero-page address
+mm     	2 byte address
+
+0,X indexed addressing, add value to X, use X as pointer to memory address where data is stored
+
+Other places to store machine code:
+For example, you can use the area from 0400 to 1FFF if it is available on your Psion model. 
+On the LZ Psion this area is used for devices like the Comms link, bar code readers and so on, 
+but if there is no such device attached, you can safely use this whole area. 
+If there is something attached, then the system variables at $2329/A and $232B/C 
+contain the addresses of the lowest and highest byte used.
+
+DYsize:
+local mc%(3),tmp%,size%,dp%,rsz%,tag%
+rem get diary cell size
+tag%=$2004
+mc%(1)=$183F :rem xgdx $18 os al$size $3F05
+mc%(2)=$0518 :rem xgdx, returns size in D, so swap with X
+mc%(3)=$3901 :rem rts $39, nop $01
+tmp%=usr(addr(mc%()),tag%) :rem usr(x%,y%) y% into D, call mc at x%, return X
+size%=tmp%-1
+print "diary size:",size%
+get
+dp%=peekw(tag%) : rem diary location
+rsz%=peekb(dp%)
+print "1st rec size:",rsz%
+get
+return size%
+
+
+Useful bits of assembler
+------------------------
+
+Passing parameters examples:
+
+18    	XGDX      	'Put ADDR(A$) in the X register D -> X
+E600	LDAB 0,X	'Put length of A$ in B
+08		INX			'Put the address of the first string character in memory addresses 41 and 42.
+DF41	STX 41		'The bytes at the addresses 41 to 4C can be freely used by machine code programs.
+
+
+18     	XGDX      	'Put the address of A%() in X
+E605	LDAB 5,X	'\ Put the replacement character A%(3) in memory
+D741	STAB 41		'/ address 41. This makes looking it up easy later on.
+A603	LDAA 3,X	'Put character A%(2) in register A.
+A705	STAA 5,X	'\ Swap values of A%(2) and A%(3). This way, the
+E703	STAB 3,X	'/ routine will undo the changes if it is called again.
+'Remove these two lines if this is not wanted.
+EE00	LDX 0,X	'Put address of string in X.
+
+Unfortunately the value of these ($41 to $4C) is not always conserved in OPL so they can't be used to pass information between OPL and MC reliably.
+
+From Boris Cornet's Dynamic arrays:
+
+Boris puts a parameter in the OPL (handle%) in this example
+
+rem grow cell by 2
+mc%(1)=$DD41 :rem std utw_s0 ;offset
+mc%(2)=$01CE :rem ldx #handle
+mc%(3)=handle%
+mc%(4)=$01CC :rem ldd #2; amount to grow cell
+mc%(5)=1000
+mc%(6)=$3F02 :rem os al$grow
+mc%(7)=$2501 :rem bcs +1 ** if error skip clear D
+mc%(8)=$5F4F :rem clrb : clra ** clear D
+mc%(9)=$1839 :rem xgdx : rts ** D->X return x
+error%=usr(addr(mc%()),tmp%)
+print"return",error%,err :rem 254 is out of memory
+return
+
+
+Useful system services
+----------------------
+
+000 00	AL$FREE
+INPUT:	X=Tag of the cell, must be in the correct range, ($2000-$203E).
+OUTPUT:	None.
+UTW_S0-3=trashed
+Frees a cell. A cell is freed by making its entry zero in the allocator table. This is the reverse of AL$GRAB. If the cell is already free, this has no effect.
+
+001 01	AL$GRAB
+INPUT:	D=Size of space to allocate
+OUTPUT:	X=Tag of the cell allocated ($2000-$203E).
+UTW_S0-3=trashed
+Allocates a new memory cell. It returns 'No Alloc Cells' error 255 if all cells are already in use, and 'Out of Memory' 254 if there is not enough memory to get a cell of the requested size.
+
+002 02	AL$GROW
+INPUT:	X=Tag of the cell, must be in the correct range, ($2000-$203E).
+D=Number of bytes the cell is to be grown
+UTW_S0=Offset into cell where to insert the new bytes. Must not be larger than the length of the cell.
+OUTPUT:	None.
+UTW_S0-3=trashed
+Increases the size of a cell. Opposite of AL$SHNK. It returns 'Out of Memory' error 254 if there is not enough memory to grow the cell by the requested amount.
+
+003 03	AL$REPL
+INPUT:	X=Tag of the cell, must be in the correct range, ($2000-$203E).
+UTW_S0=Offset into cell of the part to be replaced.
+D=Size of part to be replaced. UTW_S0+D must not be larger than the size of the cell.
+UTW_S1=Size of the new part.
+OUTPUT:	None.
+UTW_S0-3=trashed
+Changes the size of a cell by calling AL$GROW or AL$SHNK as appropriate. This is generally used when you wish to replace part of a cell by something which has a different length. It returns 'Out of Memory' error 254 if there is not enough memory to perform the requested action.
+
+004 04	AL$SHNK
+INPUT:	X=Tag of the cell, must be in the correct range, ($2000-$203E).
+D=Number of bytes the cell is to be shrunk
+UTW_S0=Offset into cell where to remove the new bytes. UTW_S0+D must not be larger than the length of the cell.
+OUTPUT:	None.
+UTW_S0-3=trashed
+Decreases the size of a cell. Opposite of AL$GROW.
+
+005 05	AL$SIZE
+INPUT:	X=Tag of the cell, must be in the correct range, ($2000-$203E).
+OUTPUT:	D=Size of the cell.
+X=Preserved
+UTW_S0=trashed
+Returns the size of a cell.
+
+109 6D	 UT$CPYB
+INPUT:	D=Target address to copy to.
+X=Source address to copy from.
+UTW_S0=Number of bytes to copy.
+OUTPUT:	None.
+Copies UTW_S0 bytes from X to D. The two areas can overlap as this service can cope with this. 
+Note that if UTW_S0=0 or if X=D, the routine does nothing. The copying rate is about 81K per second.
+
+071 47	KB$FLSH
+INPUT:	None.
+OUTPUT:	None.
+Flushes the keyboard buffer. The variables KBB_BACK, KBB_NKYS, KBB_PREV and KBB_WAIT are all set to zero.
+
+useful system variables
+-----------------------
+
+utw_s0	41/42		General word variables S0 - S5. Can be freely used, but some OS calls use these too.
+utw_s1	43/44	
+utw_s2	45/46	
+utw_s3	47/48	
+utw_s4	49/4A	
+utw_s5	4B/4C	
+utw_r0	4D/4E		General word/byte variables R0 - R6. Their high and low bytes are denoted by utb_h* and utb_l*. These must be preserved. They can be stored/ retrieved on the stack using BT$PPRG (SWI 0B).
+utw_r1	4F/50	
+utw_r2	51/52	
+utw_r3	53/54	
+utw_r4	55/56	
+utw_r5	57/58	
+utw_r6	59/5A	
+
+alt_base	2000		Base of allocator cells. Allocator cells are parts of memory used for storing data of variable size. 
+These cells are held consecutively in memory and immediately follow the system variables. 
+2000-203F are the so-called tags of the cells, and hold the addresses of the start of the allocator cells or zero of a cell is not in use. 
+The cells are manipulated by the system calls AL$FREE (SWI 00) to AL$ZERO (SWI 06)
+
+kbt_buff	20B0/BF		16 character wrap-around buffer, to hold keypresses typed ahead.
+kbb_clik	20C0		This byte stores the length of the keyboard click in ms. A value of zero will turn off the key click altogether. The default value is 1 giving the shortest possible click.
+kbb_pkof	20C1		This flag controls whether the packs are switched off by KB$TEST. If it is non- zero, which it is by default, the packs will be switched off whenever KB$TEST is called and there is are no keys in the keyboard buffer.
+kbb_capk	20C2		This byte contains the number of the key (1 to 36) required to be the CAP key. It is used only by the keyboard translate routine at bta_tran. By default it is set to 32 (the up-arrow key). To disable the CAP key altogether, a number greater than 36 should be stored in kbb_capk.
+kbb_numk	20C3		This byte contains the number of the key required to be the NUM key. It works in exactly the same way as kbb_capk.
+kbb_shfk	20C4		This flag is used to disable the shift key. It is tested only in the keyboard poll routine at bta_poll. If the flag is set, the SHIFT function is disabled and the SHIFT key will act as a normal key. Hence, the key translate routine (see bta_tran $205C) will return the 26th character of its lookup table which is usually a "?" character.
+
+
+From the Technical Reference Manual
+-----------------------------------
+
+5.1.1  CALLING SYSTEM SERVICES
+
+     The interface  to  the  operating  system  is  via  the  SWI  hardware
+instruction  followed  by the vector number of the operating system service
+required, i.e.
+
+            SWI                 ; software interrupt
+    .BYTE   VECTOR_NUMBER       ; required service vector
+HERE:
+
+
+     After execution of the SWI call, execution continues  after  the  byte
+containing the vector number, at the label HERE in the example above.
+
+     Parameters to the service are passed in one or more of the A,B (or D),
+and  X  registers  and  for  a small number of services in memory locations
+UTW_S0 and UTW_S1 which are zero page  locations.   Certain  services  also
+require  information in the runtime buffer RTT_BF.  The description of each
+service details the information required to be passed to it.   In  addition
+the  results  of a system service are returned in the machine registers A,B
+(or D) or X as required.  The addresses of UTW_S0 and UTW_S1 are  described
+in chapter 6.
+       _____________________
+5.1.2  REGISTER PRESERVATION
+
+     In general it should be assumed that all registers  (A,B  and  X)  are
+trashed  by  system  services.   If  this  is  not the case then the system
+service description will explicitly state which registers are preserved.
+       ______________
+5.1.3  ERROR HANDLING
+
+     All system services which indicate that they have  error  returns  may
+set  the  carry  flag  on exit from the system service and return the error
+code in the B register.  Note that system services such as  KB$GETK,  which
+do not return any errors, may not clear the carry flag.
+       ____________
+5.1.4  THE OS MACRO
+
+     Throughout the operating system description examples will be  provided
+which use a macro called OS which is as follows:
+
+    .MACRO      OS      XX
+    .BYTE       $3f,XX
+    .ENDM
+
+
+     Using this macro to get a key, for example, will be coded as follows:
+
+    OS          KB$GETK
+
+
+     and calling a system service which can return an error such as AL$GRAB
+should be called as follows:
+
+    CLR         A
+    CLR         B
+    OS          AL$GRAB
+    BCC         1$
+    ; HANDLE THE ERROR WHOSE CODE IS IN THE B REGISTER.
+1$:
+    ; CALL SUCCESSFUL AND X HAS THE TAG OF THE CELL.
+
+5.1.5  MEMORY USAGE
+
+     In the following description refer to chapter 6 for the  addresses  of
+the variables described.
+
+     The six words of memory storage labelled UTW_S0 to UTW_S5 are a set of
+scratch  variables used by the operating system which any service may trash
+as required.  Thus no values can be held in these words while making a call
+to  an  operating  system  service,  although  they may be used for storing
+intermediate values between calls to the operating system.
+
+         _________
+6.5.2.1  ALLOCATOR
+
+
+There are 32 allocator cells available; the first 16 are  pre-allocated  to
+the operating system, the others are available for applications.
+
+The allocator scheme is very simple.  Each cell  has  one  word  associated
+with  it (pointed to by a tag).  If the cell is assigned it gives the start
+address of the cell,  otherwise  it  is  zero.   The  first  non-zero  word
+following  gives  the  length  of  the cell by subtraction.  When a cell is
+grown all the allocated cells above it are moved up in memory, when a  cell
+is shrunk all the cells above are moved down.
+
+You may deduce from this that frequent growing and contracting of cells can
+slow an application down considerably.
+
+If any cell is altered in size, for example by calling one of the allocator
+functions  or  by  adding  or  deleting a record from device A:, any of the
+other cells may move.  It is therefore essential to re-calculate  the  base
+address of a cell every time something could have moved it.
+
+Tag     Name            Description of cell
+---     ----            -------------------
+$2000   PERMCELL        Permanent cell - for device driver code & data
+$2002   MENUCELL        Top level menu cell
+$2004   DIRYCELL        Diary cell
+$2006   TEXTCELL        Language text cell - used when translating
+$2008   SYMBCELL        Symbol table cell - used when translating
+$200A   GLOBCELL        Global record cell - used when translating
+$200C   OCODCELL        QCODE output cell - used when translating
+$200E   FSY1CELL        Field name symbol table 1 - only used in OPL
+$2010   FSY2CELL        Field name symbol table 2 - only used in OPL
+$2012   FSY3CELL        Field name symbol table 3 - only used in OPL
+$2014   FSY4CELL        Field name symbol table 4 - only used in OPL
+$2016   FBF1CELL        File buffer 1 - only used in OPL
+$2018   FBF2CELL        File buffer 2 - only used in OPL
+$201A   FBF3CELL        File buffer 3 - only used in OPL
+$201C   FBF4CELL        File buffer 4 - only used in OPL
+$201E   DATACELL        Database cell - device A:
+$2020 - $203E           Free for use by applications
+
+When device drivers are loaded  in,  the  code  is  fixed  up  and  becomes
+non-relocatable.   So  once  a device is loaded it cannot be moved which is
+why it is placed in the lowest cell.
+
+When the Organiser is re-booted (by pressing the ON/CLEAR key  at  the  top
+level)  it first removes all devices currently loaded and then boots in all
+the device drivers from the devices B:, C:  and D:.
+
+       ________
+7.5.1  KBB_STAT $7B
+
+     KBB_STAT stores the following flags:
+
+        FLAG            BIT OF KBB_STAT         DESCRIPTION
+        ====            ===============         ===========
+        KY_SHFT               7                 SET IF SHIFT KEY PRESSED
+        KY_NUMB               6                 SET IF NUMERIC LOCK
+        KY_CPNM               1                 SET IF CAP OR NUM KEY
+        KY_CAPS               0                 SET IF LOWER CASE LOCK
+
+KBB_STAT can be read directly, but system service KB$STAT should be used to
+write to it (see section 7.6.7).
+
+OPL
+---
+
+kst%=1+(peekb($7B) and 1) :rem read case lock
+kstat kst% :rem restore case lock
+
+KSTAT
+Syntax:	KSTAT <exp%>
+Sets the state of the keyboard to SHIFT mode. CAPS mode etc. <exp%> is a number from 1 to 4 according to the following table:
+1 Alpha - upper case
+2 Alpha - lower case
+3 Numeric - upper case
+4 Numeric - lower case
+
+Control characters
+------------------
+For the screen, the numbers 8 to 16 have special uses. These do not produce a visible character, but may be used to affect parts of the screen in the ways listed:
+
+CHR$(8)	Moves the cursor 1 character to the left.
+CHR$(9)	Moves the cursor to the next tab position. (The tabs are at position 9 and position 17 on the Organiser screen.)
+CHR$(10)	Moves the cursor to the next line.
+CHR$(11)	Moves the cursor to the top left "home" position of the display.
+CHR$(12)	Clears the display (equivalent to CLS).
+CHR$(13)	Moves the cursor to the left of the current line.
+CHR$(14)	Clears the top line of the display and moves the cursor to the top left.
+CHR$(15)	Clears the bottom line of the display and moves the cursor to the bottom left.
+CHR$(16)	Sounds the Organiser's buzzer.
+
+Numbers returned by GET and KEY
+-------------------------------
+When the GET and KEY functions are used, the ASCII code for the character on the key is normally returned. The keys not in the ASCII set return these numbers:
+
+1	ON/CLEAR
+2	MODE
+3	↑
+4	↓
+5	←
+6	→
+7	SHIFT and DEL
+8	DEL
+13	EXE

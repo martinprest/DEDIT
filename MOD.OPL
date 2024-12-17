@@ -1,0 +1,6 @@
+MOD:(n%,d%)
+rem get modulus of division n%/d% (remainder)
+local div%,mod%
+div%=n%/d%
+mod%=n%-(div%*d%)
+return mod%

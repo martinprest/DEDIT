@@ -1,0 +1,214 @@
+DYedrec$:(rec$,pt$)
+rem edit rec$ for new or replacement record, pt$ is prompt
+local tl%,rt$(64),rt2$(16),y2k%,kst%,alm%,dm%(12),yr%,mt%,dy%,hr%,mn%
+local info$(16),ai%,p%,ui%,k%,c%,c2%,alm$(2),r2a%,dw%,dw$(2)
+local rec2$(71),errdt%,errtm%,errclr%,wkdy$(14),ni%,pm%
+
+y2k%=84-100 rem offset for y2k bug 1940 for 2024
+wkdy$="SuMoTuWeThFrSa"
+ni%=0 rem num input flag
+
+rem days of the month: 31,28,31,30,31,30,31,31,30,31,30,31  - Feb has 29 in a leap year
+dm%(1)=31 :dm%(2)=28 :dm%(3)=31 :dm%(4)=30 :dm%(5)=31 :dm%(6)=30 rem Ja,Fe,Ma,Ap,Ma,Jn
+dm%(7)=31 :dm%(8)=31 :dm%(9)=30 :dm%(10)=31 :dm%(11)=30 :dm%(12)=31 rem Jl,Au,Se,Oc,No,De
+
+info$=DYinfo$:(rec$)
+ai%=addr(info$)
+rec2$=rec$ rem can't use addr() on external variable!
+r2a%=addr(rec2$)
+rem tl%=asc(mid$(rec$,1,1)) rem text length
+rem alm%=asc(mid$(rec$,7,1)) rem alarm minutes (zero - no alarm)
+tl%=peekb(r2a%+1) rem text length
+alm%=peekb(r2a%+7) rem alarm minutes (zero - no alarm)
+rt$=mid$(rec$,8,tl%) rem record text
+if alm%>0 :rt$=rt$+" (A:"+num$(alm%-1,2)+")" :endif
+rt2$=left$(rt$,16-len(pt$)) rem record text, first 16 chars - length of prompt
+p%=3 rem position on screen
+errdt%=0 rem error in date or time flag
+errclr%=0 rem 1 if err just been cleared
+
+rem info$="xx"+dy$+"-"+mt$+"-"+yr$+" "+h$+":"+m$
+rem "xx01-01-01 09:00"
+rem "123456789ABCDEFG"
+
+kst%=1+(peekb($7B) and 1) rem read case lock
+
+edinfo::
+kstat 3 rem set numeric + uppercase
+
+rem * print info
+cls
+print info$;
+print pt$+rt2$;
+cursor on
+
+rem * edit info
+edlp::
+ui%=0 rem update info flag
+cursor off
+if errclr%=1 and errdt%=0 and errtm%=0 :print chr$(15)+pt$+rt2$; :errclr%=0 :endif
+at 1,1 :print info$;
+at p%,1
+cursor on
+c%=peekb(ai%+p%) rem char from info$
+
+k%=get
+rem cursor off
+if k%=1 :cursor off :kstat kst% :return "" rem On/Clr to exit
+elseif k%=13 and errdt%=0 and errtm%=0 :goto edit:: rem EXE to set
+elseif k%>47 and k%<58 :c%=k% :if p%<=10 :ui%=1 :else :ui%=2 :endif :ni%=1 rem enter number
+elseif k%=6 rem right
+ goto right::
+elseif k%=5 rem left
+ goto left::
+elseif k%=3 or k%=4 rem up or down
+ c%=c%-(k%=3) rem up, true is -1
+ c%=c%+(k%=4) rem down
+ pm%=MOD:(p%,3) rem modulus of p%/3
+ rem * carry units up
+ if pm%=1 and c%=58 :c2%=peekb(ai%+p%-1) :if c2%<57 :pokeb ai%+p%-1,c2%+1 :endif :endif rem if units of dy>9 inc tens of dy
+ rem * carry units down
+ if pm%=1 and c%=47 :c2%=peekb(ai%+p%-1) :if c2%>48 :pokeb ai%+P%-1,c2%-1 :endif :endif rem if units of dy<0 dec tens of day
+ rem * wrap numbers
+ if c%=47 :c%=57 :endif rem 0 to 9
+ if c%=58 :c%=48 :endif rem 9 to 0
+ if p%<=10 :ui%=1 :else :ui%=2 :endif rem ui%=1 update date, ui%=2 update time
+endif
+
+if ui%>0 rem if update info flag set
+ pokeb ai%+p%,c% rem poke char into info$
+endif
+
+if ui%=1 rem ui%=1 update date
+ goto date::
+ dtchk::
+ if mod:(yr%,4)=0 :dm%(2)=29 :else dm%(2)=28 :endif rem 29 days in Feb in a leap year
+ if mt%<1 or mt%>12
+  if errdt%=0 :goto errdate:: :endif
+  goto edlp::
+ elseif dy%<1 or dy%>dm%(mt%) rem needs to be after mt% so can use dm%()
+  if errdt%=0 :goto errdate:: :endif
+  goto edlp::
+ else rem no error in date
+  if errdt%=1 :errdt%=0 :errclr%=1 :endif 
+  dw%=dow:(dy%,mt%,yr%+y2k%) rem convert to day of week
+  dw$=mid$(wkdy$,dw%*2+1,2)
+  info$=dw$+right$(info$,14)
+ endif
+elseif ui%=2 rem ui%=2 update time
+ goto time::
+ tmchk::
+ if hr%>23 or mn%>59 
+  if errtm%=0 :goto errdate:: :endif
+ else 
+  if errtm%=1 :errtm%=0 :errclr%=1 :endif
+ endif
+endif
+
+if ni%=1 :ni%=0 :goto right:: :endif rem if num input, move cursor right
+
+goto edlp::
+
+right::
+if p%=4 or p%=7 or p%=10 or p%=13 :p%=p%+1 :endif
+if p%<16 :p%=p%+1 :endif 
+goto edlp::
+
+left::
+if p%=6 or p%=9 or p%=12 or p%=15 :p%=p%-1 :endif
+if p%>3 :p%=p%-1 :endif 
+goto edlp::
+
+errdate::
+if ui%=1
+ errdt%=1
+ info$="--"+right$(info$,14)
+else
+ errtm%=1
+endif
+print chr$(15);"Bad Date or Time"; rem clear bot line & print err message
+goto edlp::
+
+rem * set date & time, then edit text
+edit::
+ui%=0 rem update info flag
+
+date::
+yr%=int(val(mid$(info$,9,2))-y2k%) rem yr - need to use val because digits can change independently
+mt%=int(val(mid$(info$,6,2))) rem mt - fn argument error later if mt=0 because pokeb will have -1 hence 16-bit num !!
+dy%=int(val(mid$(info$,3,2))) rem dy
+if ui%=1 :goto dtchk:: :endif
+
+time::
+hr%=int(val(mid$(info$,12,2))) rem hr
+mn%=int(val(mid$(info$,15,2))) rem mn
+if ui%=2 :goto tmchk:: :endif
+
+kstat kst% rem restore keyboard case lock
+rt$=mid$(rec$,8,tl%) rem remove alarm text
+
+rem * edit rec text
+print chr$(15)+pt$; rem print prompt
+trap edit rt$ rem edit record text
+if err=206 :cursor off :goto edinfo:: :endif rem back to info if On/Clr
+if len(rt$)=0 :print chr$(14);"No text!"; :goto edit:: :endif
+
+if alm%>0
+ alm$=num$(alm%-1,2)
+else
+ alm$=""
+endif
+
+rem * set alarm
+print chr$(15);"Alarm Y/N?";
+pause 5 rem 5x 1/20 second = 1/4 second
+KBflsh: rem flush keyboard buffer - ** debug key bounce?? **
+k%=get
+k%=k% and $DF rem force uppercase ASCII
+if k%<>%Y :goto noalm:: :endif
+kstat 3 rem numeric + uppercase
+
+setalm::
+print chr$(15);"Mins:";
+trap edit alm$
+if err=206 :alm$="" :endif rem no alarm if On/Clr
+if len(alm$)=0 :goto noalm:: :endif rem no alarm
+
+onerr erralm::
+alm%=int(val(alm$)) rem alarm minutes, causes error if alm$ not a number
+onerr off
+
+if alm%<0 or alm%>59 :goto erralm:: :endif
+goto setinfo::
+
+erralm::
+onerr off
+print chr$(14);"Alarm 0-59 only!";
+alm$=""
+goto setalm::
+
+noalm::
+alm%=-1 rem no alarm, +1 later, so zero
+
+rem * set info bytes
+setinfo::
+alm%=alm%+1 rem +1 so that zero is no alarm and 1 is 0 mins
+kstat kst% rem restore keyboard case lock
+cursor off
+
+rem * put bits together
+rem info$ "xx01-01-01 09:00"
+rem        123456789ABCDEFG
+rem LYMDHMA len,yr,mt,dy,hr,mn,alm
+rem 1234567
+
+rem rec2$=rec$
+rem r2a%=addr(rec2$) rem use address to poke new values into rec2$
+pokeb r2a%+2,yr% rem yr
+pokeb r2a%+3,mt%-1 rem mt
+pokeb r2a%+4,dy%-1 rem dy
+pokeb r2a%+5,hr% rem hr
+pokeb r2a%+6,mn% rem mn
+pokeb r2a%+7,alm% rem alarm minutes or 0 for no alarm
+rec2$=chr$(len(rt$))+mid$(rec2$,2,6)+rt$
+return rec2$

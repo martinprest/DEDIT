@@ -1,0 +1,236 @@
+DEDIT:
+rem main proc - edit Psion Organiser 2 XP diary records
+
+global rn%,tnr%
+local tag%,da%,dp%,sz%,yr%,tl%,dpt%,rnt%,tnrt%,nib%
+local k%,mu%,alm%,fnd%,flw%,rnsrch%,rns%,ra%
+local rec$(71),info$(16),rn$(2),rt$(64),tnr$(3),fnd$(64),fi$(1),pt$(5)
+local dp2% rem debug only
+
+nib%=7 rem no. of info bytes (7-XP) - not used - moved elsewhere!!
+tag%=$2004 rem pointer to diary allocator cell
+ra%=addr(rec$) rem rec$ address, could be used to peek and poke chars - not used !!
+flw%=1 rem follow edited record to new location? Quicker to follow
+rnsrch%=0 rem record number search? Temporary flag, used to find old record after edit - set by flw%=0
+rem kstat 2 rem lowercase
+kstat 1 rem uppercase
+fnd%=0
+fi$=" " rem find indicator
+
+sz%=DYsize: rem sz% is total diary size here, record size later
+tnr%=DYnrecs: rem set total number of records
+
+rem * optional startup screen
+rem cls
+rem print"size:";sz%;" bytes"
+rem print"records:";tnr%
+rem get
+
+reset:: rem * reset diary pointer
+rem cls :print"reset" :get rem ** for debug
+rem da%=peekw(tag%) rem read diary address
+rem print"diary at: $";hex$(da%) :get
+rn%=1
+dp%=0
+
+read:: rem * read record at diary pointer to rec$
+rec$=DYread$:(dp%)
+sz%=len(rec$)
+rem print sz% :get rem ** debug only
+
+end:: rem * end of diary reached
+if sz%=0
+ fnd%=0 :fi$=" " rem stop find, if enabled
+ cls
+ print"* END OF DIARY *";
+ if rn%=1
+  print"EMPTY - NEW Y/N?";
+  k%=get
+  k%=k% and $DF rem force uppercase ASCII
+  if k%=%Y :pt$="NEW:" :goto new::
+  else :return rem exit
+  endif
+ endif
+ k%=get
+ if k%=1 :return :endif rem exit if On/Clr
+ goto reset::
+endif
+
+if rnsrch%=1 rem do record number search (used to find old record after edit)
+ if rn%<rns% :goto next:: :endif
+ rnsrch%=0 rem found so stop search - try this next with goto disp
+ goto disp:: rem skip FIND if just done rnsrch
+endif
+
+rem * find a record
+if fnd%=1
+ if loc(rec$,fnd$)>0 rem found one
+  goto disp::
+ else
+  goto next::
+ endif
+endif
+
+rem info$="xx"+dy$+"-"+mt$+"-"+yr$+" "+h$+":"+m$
+rem "xx01-01-01 09:00"
+rem "123456789ABCDEFG" 
+
+rem * display record
+disp::
+info$=DYinfo$:(rec$)
+if fnd%=1 :fi$="F" :else fi$=" " :endif rem fi$ is find indicator in info$
+info$=left$(info$,10)+fi$+right$(info$,5) rem insert find indicator to info$
+tl%=asc(mid$(rec$,1,1)) rem text length
+yr%=asc(mid$(rec$,2,1)) rem needed for anniv
+alm%=asc(mid$(rec$,7,1)) rem alarm minutes (zero - no alarm)
+rt$=mid$(rec$,8,tl%) rem record text
+if alm%>0 :rt$=rt$+" (A:"+num$(alm%-1,2)+")" :endif
+
+redisp:: rem re-display if record not changed
+mu%=0
+cls
+print info$;
+k%=view(2,rt$) rem view current record, scroll if needed (stop & start with left & right arrows)
+goto select::
+
+keyget:: rem * get a key press
+k%=get
+
+select:: rem *select edit option
+k%=k% and $DF rem force uppercase ASCII
+
+if k%=13 rem EXE for * NEXT record
+ goto next::
+elseif k%=3 rem first record (* UP - top of list)
+ goto reset::
+elseif k%=4 rem last record (* DOWN - bottom of list)
+ rns%=tnr% rem set search to last record
+ rnsrch%=1 rem do record num search
+ goto reset::
+elseif k%=2
+ k%=0 rem needed to prevent menu re-appearing after redisp/select
+ rn$=num$(rn%,2) rem for rn shown in menu
+ tnr$=num$(tnr%,3)
+ mu%=menu("r:"+rn$+"/"+tnr$+",NEW,COPY,ANNIV,DEL,EDIT,FIND,MODE,BACK,ZAP,QUIT")
+ if mu%=0 :goto redisp:: :endif
+ if mu%=1 :goto info:: :endif
+ goto select:: rem back to 1st if statement (elseif below!)
+rem mu% below only on 2nd pass
+elseif k%=%N or mu%=2 rem N for * NEW at current date&time
+ pt$="NEW:" :goto new::
+elseif k%=%C or mu%=3 rem C for * COPY
+ pt$="COPY:" :goto edcpy::
+elseif k%=%A or mu%=4 rem A for * ANNIV
+ pt$="ANN:" :goto anniv::
+elseif k%=%D or mu%=5 rem D for * DEL
+ goto delete::
+elseif k%=%E or mu%=6 rem E for * EDIT
+ pt$="EDIT:" :goto edcpy::
+elseif k%=%F or mu%=7 rem F for * FIND
+ if fnd%=0 rem if not already finding
+  cls
+  print"FIND:";
+  trap edit fnd$ rem edit record text
+  if err=206 :goto redisp:: :endif rem exit if On/Clr
+  if fnd$<>"" 
+   fnd%=1
+   goto reset:: rem reset to 1st rec and find
+  endif 
+ else
+  fnd%=0 :goto disp:: rem disp to update fi$
+ endif
+elseif k%=%M or mu%=8 rem M for * MODE
+ do
+  cls
+  print"MODE(after edit)";
+  if flw%=0
+   print"old rec (slow)"
+  else
+   print"new rec (quick)"
+  endif
+  k%=get
+  if k%=%M or k%=2 :flw%=1-flw% :endif rem toggle follow mode
+ until k%=1 or k%=13
+ goto redisp::
+elseif k%=%B or mu%=9 rem B for * BACK
+ if rn%>1
+  rns%=rn%-1 rem set rec num search value
+  rnsrch%=1 rem do record num search
+  goto reset::
+ else  
+  goto redisp::
+ endif
+elseif k%=%Z or mu%=10 rem Z for * ZAP - erase whole diary!!
+ cls
+ print"Erase Diary Y/N?";
+ k%=get
+ if k%<>%Y :goto redisp:: :endif
+ print"Are You Sure?"
+ pause 5 rem 5x 1/20 second = 1/4 second
+ KBflsh: rem flush keyboard buffer - ** prevent key bounce **
+ k%=get
+ if k%<>%Y :goto redisp:: :endif
+ sz%=DYsize: rem diary size
+ DYdel:(0,sz%) rem delete it all!!
+ tnr%=0
+ goto reset:: 
+elseif k%=1 or k%=%Q or mu%=11 :return rem On/Clr or Q for * QUIT (exit)
+endif
+goto keyget::
+
+next:: rem * next record
+rn%=rn%+1
+dp%=dp%+sz% rem advance pointer by size of record
+goto read::
+
+info::
+cls
+print"Diary:";DYsize:;" bytes"
+print"Records:";tnr%
+get
+goto redisp::
+
+anniv:: rem * copy record to next year
+rem print chr$(14)+"   Anniv Y/N?" rem clear top line & print
+rem k%=get 
+rem k%=k% and $DF rem force uppercase ASCII
+rem if k%<>%Y :goto read:: :endif
+rem rec$=chr$(tl%)+chr$(yr%+1)+right$(rec$,sz%-2) rem ** use pokeb instead ??
+pokeb ra%+2,yr%+1 rem +1 to year
+goto edcpy::
+
+new:: rem * create new record at current date & time
+rec$=chr$(0)+chr$(YEAR-1900)+chr$(MONTH-1)+chr$(DAY-1)+chr$(HOUR)+chr$(MINUTE)+chr$(0)
+rem goto edcpy::
+
+edcpy:: rem * edit or copy record
+rec$=DYedrec$:(rec$,pt$)
+if rec$="" :goto read:: :endif
+if pt$="EDIT:"
+ DYdel:(dp%,sz%) rem delete then add edited rec
+ tnr%=tnr%-1
+endif
+rem goto add::
+
+add:: rem * adds or replaces in correct location, rn% and tnr% updated
+rnt%=rn% rem rec number temp
+dpt%=dp% rem diary pointer temp
+tnrt%=tnr% rem if replaced, will be same after add, otherwise tnr% is +1
+dp%=DYiadd:(rec$) rem diary pointer
+if dp%=-1 :get :return :endif rem exit if error
+if dp%=-2 :dp%=dpt% :goto read:: :endif rem did not replace, restore dp% and re-display
+if dp%<dpt% rem if new record earlier -move back to it, also if during find -pause search until record displayed
+ if flw%=0 :rnsrch%=1 :rns%=rnt%+tnr%-tnrt% :endif rem if new rec earlier, old rec will be +1, unless replaced
+endif
+if dp%>dpt% and flw%=0 :dp%=dpt% :rn%=rnt% :endif rem if new record later -restore dp% and rn%, keep old dp%, re-display old record
+goto read::
+
+delete:: rem * delete current record, dp% and rn% stay the same, decrement tnr%
+print chr$(14)+info$;
+print chr$(15)+"  DELETE Y/N?" rem clear bot line & print
+k%=get
+k%=k% and $DF rem force uppercase ASCII
+if k%<>%Y :goto read:: :endif
+DYdel:(dp%,sz%)
+tnr%=tnr%-1
+goto read::

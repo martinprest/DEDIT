@@ -1,0 +1,10 @@
+DOW:(d%,m%,y%)
+rem get day of week as no.0-6, with Sunday as 0
+local yy%,ly%,mm%(12),dow%,m2%
+m2%=m% rem index must be local
+mm%(2)=3 :mm%(3)=3 :mm%(4)=6 :mm%(5)=1 :mm%(6)=4
+mm%(7)=6 :mm%(8)=2 :mm%(9)=5 :mm%(11)=3 :mm%(12)=5
+yy%=mod:(y%+(y%/4),7)
+if flt(y%)/4.0=y%/4 and m%<3 :ly%=-1 :endif
+dow%=mod:(yy%+mm%(m2%)+6+d%+ly%,7) rem 6 for 2k century
+return dow%

@@ -1,0 +1,20 @@
+DYsize:
+rem get diary cell size using os call
+local mc%(3),tag%,size%
+rem local da%,rsz%
+
+rem * OS al$size for size of diary cell - used in info by dedit
+
+tag%=$2004 rem diary tag
+rem X <- diary tag, then call al$size to get diary cell size
+mc%(1)=$1801 rem xgdx $18, nop $01
+mc%(2)=$3F05 rem os al$size $3F05
+mc%(3)=$1839 rem xgdx $18 - returns size in D, so swap with X, rts $39
+
+size%=usr(addr(mc%()),tag%) rem usr(x%,y%) put val at y% into D, call mc at x%, return X
+rem print"diary size:",size% :get
+rem da%=peekw(tag%) rem diary location
+rem print"diary: $";hex$(da%)
+rem rsz%=peekb(da%)
+rem print "1st rec size:",rsz% :get
+return size%-1 rem always need extra zero byte at end

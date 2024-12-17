@@ -1,0 +1,36 @@
+DYread$:(dp%)
+rem get diary record at dp%
+rem end of diary returns null string
+local da%,sz%,start%,mc%(7),rec$(71)
+
+rem * could be done using peek and poke, but OS call used instead
+rem * OS ut$cpyb copies diary rec to rec$
+rem * source address in X, dest address in D, no. of bytes in utw_s0
+
+da%=peekw($2004) rem diary address
+sz%=peekb(da%+dp%) rem length of record, or 0 if no record
+if sz%=0
+ return ""
+endif
+sz%=sz%+7 rem 7 info bytes (XP)
+rem print"sz%:",sz% :get
+
+rem utw_s0<-D, sz% no. of bytes to copy
+mc%(1)=$DD41 rem STD $41 store D in $41-$42 (utw_s0) no. of bytes to copy
+
+rem X<-da%+dp% source address, D<-addr(rec$)+1 destination address
+mc%(2)=$01CC rem NOP :LDD #
+mc%(3)=da%+dp% rem source address
+mc%(4)=$18CC rem XGDX D->X :LDD#
+mc%(5)=addr(rec$)+1 rem destination address
+mc%(6)=$3F6D rem OS ut$cpyb copy utw_s0 bytes from addr(X) to addr(D), X and D preserved after call, unless error?
+mc%(7)=$3901 rem RTS :NOP
+
+start%=addr(mc%())
+rem print"c:$";hex$(start%),"D:$";hex$(sz%); :get
+rem print"r"
+start%=usr(start%,sz%) rem usr(x%,y%) put y% into D, x% into X, call mc at x%, return X
+rem print"sz:$";hex$(start%) :get
+pokeb addr(rec$),sz% rem poke rec length
+
+return rec$

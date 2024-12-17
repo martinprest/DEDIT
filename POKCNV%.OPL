@@ -1,0 +1,19 @@
+POKCNV%:(P%,A$)
+LOCAL A%,B%,C%,D%
+
+A%=1
+D%=P%
+WHILE A%<LEN(A$)
+  B%=ASC(MID$(A$,A%,1))-%0
+  IF B%>9
+    B%=B%-7
+  ENDIF
+  C%=ASC(MID$(A$,A%+1,1))-%0
+  IF C%>9
+    C%=C%-7
+  ENDIF
+  POKEB D%,B%*16+C%
+  D%=D%+1
+  A%=A%+2
+ENDWH
+RETURN D%

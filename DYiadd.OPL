@@ -1,0 +1,59 @@
+DYiadd:(rec2$)
+rem& external rn%,tnr%
+rem info add - add in correct place depending on info
+local da%,dp%,ea%,sz%,sz2%,i%,tag%,rec$(71)
+local k%,nc%,nn%,rt$(64),nib%
+tag%=$2004 rem pointer to diary allocator cell
+
+da%=peekw(tag%) rem diary address
+dp%=0 rem reset diary pointer
+rn%=1
+
+read:: rem * read record
+rec$=DYread$:(dp%)
+sz%=len(rec$)
+if sz%=0: goto add:: :endif rem if end of diary add
+
+rem scan through date & time to find where to add new record
+rem info bytes for XP
+rem LYMDHMA len,yr,mt,dy,hr,mn,alm
+rem 1234567
+
+i%=1 rem info byte position
+do rem * compare yr,mt,dy,m,s of new to current
+ i%=i%+1
+ nc%=asc(mid$(rec$,i%,1)) rem num current
+ nn%=asc(mid$(rec2$,i%,1)) rem num new
+ if nn%>nc% :goto next:: :endif rem if bigger move to next rec
+ if nn%<nc% :goto add:: :endif  rem if smaller add here
+until i%=6
+if nc%=nn% :goto replace:: :endif rem identical
+
+next:: rem * next record
+rn%=rn%+1
+dp%=dp%+sz% rem advance pointer by size of record
+goto read::
+
+replace:: rem * display record to be replaced, ask y/n, del, add
+cls
+at 3,1: print"Replace Y/N?"
+rt$=mid$(rec$,8,sz%-7) rem record text, 7 info bytes for XP
+print left$(rt$,16); rem crop to fit on screen
+k%=get
+k%=k% and $DF rem force uppercase ASCII
+if k%<>%Y :return -2 :endif
+DYdel:(dp%,sz%)
+tnr%=tnr%-1
+
+add:: rem * add record
+cls
+sz2%=len(rec2$)
+ea%=DYadd:(dp%,rec2$) rem ea% end address after added record
+tnr%=tnr%+1
+
+if ea%<da%+dp%+sz2% rem shouldn't happen, but maybe if out of memory?
+ print chr$(15)+"Err, Out of mem?"; :get rem clear bottom line and print error
+ return -1
+endif 
+
+return dp%

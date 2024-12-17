@@ -1,0 +1,22 @@
+DYnrecs:
+rem get num of recs in rn% and diary size in bytes 
+local da%,dp%,rn%,size%,sz%
+
+da%=peekw($2004) rem diary address
+rem print"diary at: $";hex$(da%) :get
+rn%=0 :size%=0 :dp%=0
+do
+ sz%=peekb(da%+dp%)
+ if sz%=0: goto end:: :endif
+ sz%=sz%+7 rem 7 info bytes XP
+ rem print"sz%:",sz% :get 
+ size%=size%+sz%
+ dp%=dp%+sz%
+ rn%=rn%+1
+until size%>10000 rem exit if diary>10kB - just in case
+print"Diary >10kB";
+print"Too big!"
+ 
+end::
+rem print rn%;"rc, ";size%;"b"
+return rn%

@@ -1,0 +1,15 @@
+DEDIT 16
+dedit OB3 ! main procedure
+dysize OB3 ! OS call to get Diary cell size
+dynrecs OB3 ! PEEKB to get tot record number (and diary size)
+dyread$ OB3 ! reads a diary record
+dydel OB3 ! deletes a diary record
+dyadd OB3 ! adds a diary record
+dyiadd OB3 ! adds a diary record in date order
+dyinfo$ OB3 ! reads info bytes of diary record
+dyedrec$ OB3 ! edits a diary record
+MOD OB3 ! modulus function
+DOW OB3 ! day of the week function
+KBflsh OB3 ! flush keyboard buffer
+POKCNV% OB3 ! Jaap's machine code builder
+TIMEINST OB3 ! run Jaap's fix for y2k dates

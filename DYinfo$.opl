@@ -1,0 +1,49 @@
+DYinfo$:(rec$)
+rem get info bytes from diary record
+local y2k%,yr%,mt%,dy%,h%,m%,dw%,ra%,info$(16),rec2$(71)
+local yr$(2),mt$(2),dy$(2),h$(2),m$(2),wkdy$(14),dw$(2)
+
+y2k%=84-100 rem offset for y2k bug 1940 for 2024
+wkdy$="SuMoTuWeThFrSa"
+
+rem info bytes for XP
+rem LYMDHMA len,yr,mt,dy,h,m,alm
+rem 1234567
+rem info$="xx"+dy$+"-"+mt$+"-"+yr$+" "+h$+":"+m$
+rem "xx01-01-01 09:00"
+rem "123456789ABCDEFG" 
+
+rem * read info bytes
+rec2$=rec$
+ra%=addr(rec2$) rem rec2$ address, can't do this on external variable
+yr%=peekb(ra%+2) rem peekb quicker than asc(mid$()) ?
+mt%=peekb(ra%+3)+1
+dy%=peekb(ra%+4)+1
+h%=peekb(ra%+5)
+m%=peekb(ra%+6)
+
+rem yr%=asc(mid$(rec$,2,1))
+rem mt%=asc(mid$(rec$,3,1))+1
+rem dy%=asc(mid$(rec$,4,1))+1
+rem h%=asc(mid$(rec$,5,1))
+rem m%=asc(mid$(rec$,6,1))
+
+rem * convert info numbers to strings
+yr$=NUM$(yr%+y2k%,2)
+mt$=NUM$(mt%,2)
+dy$=NUM$(dy%,2)
+h$=NUM$(h%,2)
+m$=NUM$(m%,2)
+
+rem * pad sting with extra 0 if needed
+if len(yr$)=1 :yr$="0"+yr$ :endif
+if len(mt$)=1 :mt$="0"+mt$ :endif
+if len(dy$)=1 :dy$="0"+dy$ :endif
+if len(h$)=1 :h$="0"+h$ :endif
+if len(m$)=1 :m$="0"+m$ :endif
+
+dw%=dow:(dy%,mt%,yr%+y2k%) rem convert to day of week
+dw$=mid$(wkdy$,dw%*2+1,2)
+
+info$=dw$+dy$+"-"+mt$+"-"+yr$+" "+h$+":"+m$
+return info$
