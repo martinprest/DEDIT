@@ -26,7 +26,6 @@ rem print"records:";tnr%
 rem get
 
 reset:: rem * reset diary pointer
-rem cls :print"reset" :get rem ** for debug
 rem da%=peekw(tag%) rem read diary address
 rem print"diary at: $";hex$(da%) :get
 rn%=1
@@ -35,7 +34,6 @@ dp%=0
 read:: rem * read record at diary pointer to rec$
 rec$=DYread$:(dp%)
 sz%=len(rec$)
-rem print sz% :get rem ** debug only
 
 end:: rem * end of diary reached
 if sz%=0
