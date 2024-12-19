@@ -5,7 +5,6 @@ global rn%,tnr%
 local tag%,da%,dp%,sz%,yr%,tl%,dpt%,rnt%,tnrt%,nib%
 local k%,mu%,alm%,fnd%,flw%,rnsrch%,rns%,ra%
 local rec$(71),info$(16),rn$(2),rt$(64),tnr$(3),fnd$(64),fi$(1),pt$(5)
-local dp2% rem debug only
 
 nib%=7 rem no. of info bytes (7-XP) - not used - moved elsewhere!!
 tag%=$2004 rem pointer to diary allocator cell
