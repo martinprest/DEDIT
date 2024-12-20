@@ -8,12 +8,15 @@ Introduction
 An editor for diary entries, which lists them in ascending chronological order.
 Provides functions such as: Edit, Delete and Find, plus Anniv for copying anniversaries to the following year.
 Compatible with the main Organiser DIARY and Jaap's year 2000 fix.
-DEDIT can be used as an alternative to the main DIARY, although not all functions are reproduced (Tidy from DIARY is quite useful).
-As a precaution, use the Save function of the main DIARY before installing DEDIT, and to periodically backup your diary!
+DEDIT can be used as an alternative to the main DIARY, although not all functions are reproduced.
+As a precaution, use the SAVE function of the main DIARY before installing DEDIT, and to periodically backup your diary!
 
 Files
 -----
 DEDIT:					main program
+FILES.BLD   build file listing files for BLDPACK to build a pack
+DEDIT_beta.opk   pack image with all the files
+DEDIT_beta.sna   XP 32K snap file for Jaap's Jape emulator for those who want to try it without having to run TIMEINST first
 DYsize:					OS call of diary allocator cell size
 DYnrecs:				gets total number of records (similar to DYsize, but uses PEEKB instead of OS call)
 DYread$:(dp%)			get diary record at dp%, end of diary returns null string (dp% is diary pointer, relative to diary start address)
@@ -37,6 +40,7 @@ FOR XP or CM only - The LZ Diary works differently
 Modification of the program may result in a system crash, and although I've been testing it, use with caution!
 
 Copy all files to a datapak or to A: using a CommsLink
+Or build a pack using BLDPACK and the BUILD file and copy to a pack
 To use with Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG then RUN 
 and enter TIMEINST in A:, B: or C: as appropriate to install the Y2K fix.
 (TIMEINST uses POKCNV% to convert and poke the machine code)
@@ -47,33 +51,41 @@ Use MODE on the main menu to install DEDIT there, or use PROG, RUN, and enter DE
 Using DEDIT
 -----------
 DEDIT works a bit like the LIST option in the XP (or CM) DIARY, except that it allows to edit diary entries.
-Diary entries are stored in a memory allocator cell in a similar format to database records in the A:MAIN file, 
+Diary entries are stored in a memory allocator cell in a similar format to database records in the A:MAIN database
 but different enough that OS calls are required to add or delete them.
 The OS calls used are: 
 al$grow - grows an allocator cell (from a given point)
 al$shrink - shrinks an allocator cell (from a given point)
 ut$cpyb - copies memory contents from one place to another (used to read/write diary entries to/from a string variable)
 
-Diary entries are referred to as records in this document.
-On launch, the first record is dispalyed, which will be the oldest entry in the diary.
+Diary entries are referred to as records for DEDIT.
+On launch, the record browser displays the first record, which will be the oldest entry in the diary.
 Records are displayed in the following format:
 ddDD-MM-YY HH:MM, where: dd=day, DD=date, MM=Month, YY=year, HH=hour, MM=minute
-record text is displayed on the line below and will scroll if longer than 16 characters. Max length for diary entries is 64 chars.
-Find mode is indicated by a capital F between the date and time on the top line of the display.
+Record text is displayed on the line below and will scroll if longer than 16 characters. 
+Max length for diary entries is 64 chars. If record has an alarm set, it is inducated as (A:xx) where x is the time in minutes for the alarm prior to the record time.
+(uses OPL view) so left and right arrows stop or continue scrolling, as appropriate.
+FIND mode is indicated by a capital F between the date and time on the top line of the display.
+When an editing mode is selected (NEW, EDIT, COPY or ANNIV), the text prompt (2nd line) indicates the mode (ANNIV is displayed as ANN to save space on the screen).
 
 Keys
 ----
-EXE moves to the next record, or during Find it will find the next match.
+EXE moves to the next record, or during FIND it will find the next match.
 UP & DOWN arrows move to first or last record, respectively.
 
-During EDIT of date & time, arrow keys move left & right and up & down to increase or decrease numbers on date & time, 
+During edit of date & time, arrow keys move left & right and up & down increase or decrease numbers on date & time, 
 or numbers can be entered on the keypad.
-There's some basic error checking of date & time, invalid date or time generates a "Bad Date or Time" error until date & time are ok.
+Invalid date or time generates a "Bad Date or Time" error until date & time are corrected.
+EXE confirms the date & time, then record text can be edited.
+On/Clr during date and time edit cancels the edit and returns to the record browser.
 
-During EDIT of record text (uses OPL command EDIT): UP goes to start, DOWN goes to end, On/Clr clears the text.
+During EDIT of record text (uses OPL command EDIT): UP goes to start, DOWN goes to end, On/Clr clears the text. 
+On/Clr a second time returns the edit cursor to the time & date.
+EXE enters the text, then the alarm time can be edited (no. of minutes before the event time, max 59)
 
 To choose an editing function, press MODE to get the options in a menu, or just press the 1st letter of the option (without the menu):
 r*/*,NEW,COPY,ANNIV,DEL,EDIT,FIND,MODE,BACK,ZAP,QUIT
+On/Clr can also be used to QUIT and return the the Organiser main menu.
 
 The 1st menu item is a record indicator showing the current record number and the total number of records, e.g.:
 r2/7 would be record 2 of a total of 7 records. Selecting this item will show 
@@ -90,8 +102,8 @@ BACK	move back to previous record
 ZAP		delete whole diary, all records! Use with caution! Asks to confirm Y/N, twice
 QUIT	exit DEDIT
 
-note1:	moving back works by scanning forwards from the start through the whole diary to the previous record, this is incase record size has changed due to edit
-note2:	mode set to old record also scans the diary, so can be slow if the diary has a lot of records
+note1:	BACK operates by returning to the 1st record, then scanning forwards to the previous record; this method is simple and reliable but slow.
+note2:	MODE set to "old rec" (see above) also scans the diary, so can be slow if the diary has a lot of records.
 
 The diary is held in what is called an "allocator cell" which is a reserved area of RAM.
 There are a number of allocator cells and they can each be made bigger or smaller.
