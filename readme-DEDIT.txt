@@ -48,7 +48,7 @@ and enter TIMEINST in A:, B: or C: as appropriate to install the Y2K fix.
 Set time using TIME on the Organiser main menu.
 Use MODE on the main menu to install DEDIT there, or use PROG, RUN, and enter DEDIT
 
-Using DEDIT
+About DEDIT
 -----------
 DEDIT works a bit like the LIST option in the XP (or CM) DIARY, except that it allows to edit diary entries.
 Diary entries are stored in a memory allocator cell in a similar format to database records in the A:MAIN database
@@ -59,6 +59,9 @@ al$shrink - shrinks an allocator cell (from a given point)
 ut$cpyb - copies memory contents from one place to another (used to read/write diary entries to/from a string variable)
 
 Diary entries are referred to as records for DEDIT.
+
+Using DEDIT
+-----------
 On launch, the record browser displays the first record, which will be the oldest entry in the diary.
 Records are displayed in the following format:
 ddDD-MM-YY HH:MM, where: dd=day, DD=date, MM=Month, YY=year, HH=hour, MM=minute
