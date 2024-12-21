@@ -14,8 +14,8 @@ As a precaution, use the SAVE function of the main DIARY before installing DEDIT
 Files
 -----
 DEDIT:					main program
-files.trn
-dedit.bld
+files.trn list of files to translate from opl to object ob3 files using opltran or atran
+dedit.bld same list of files, but as ob3 to make a pack using bldpack or makepack
 DEDIT_beta.opk   pack image with all the files
 DEDIT_beta.sna   XP 32K snap file for Jaap's Jape emulator for those who want to try it without having to run TIMEINST first
 DYsize:					OS call of diary allocator cell size
@@ -53,6 +53,8 @@ Use MODE on the main menu to install DEDIT there, or use PROG, RUN, and enter DE
 
 About DEDIT
 -----------
+DEDIT began as a couple of OPL functions to delete (DYdel) and add (DYadd) diary records, then DYiadd was added to ensure records are added in chronological order by looking at the data and time of each record and adding the new record in the correct place.
+
 DEDIT works a bit like the LIST option in the XP (or CM) DIARY, except that it allows to edit diary entries.
 Diary entries are stored in a memory allocator cell in a similar format to database records in the A:MAIN database
 but different enough that OS calls are required to add or delete them.
