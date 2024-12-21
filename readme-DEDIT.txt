@@ -71,7 +71,7 @@ ddDD-MM-YY HH:MM, where: dd=day, DD=date, MM=Month, YY=year, HH=hour, MM=minute
 Record text is displayed on the line below and will scroll if longer than 16 characters. 
 Max length for diary entries is 64 chars. If record has an alarm set, it is inducated as (A:xx) where x is the time in minutes for the alarm prior to the record time.
 (uses OPL view) so left and right arrows stop or continue scrolling, as appropriate.
-FIND mode is indicated by a capital F between the date and time on the top line of the display.
+FIND mode is indicated by a capital F between the date and time on the top line of the display. FIND mode ends when the end of the diary is reached.
 When an editing mode is selected (NEW, EDIT, COPY or ANNIV), the text prompt (2nd line) indicates the mode (ANNIV is displayed as ANN to save space on the screen).
 
 Keys
@@ -100,9 +100,9 @@ further info: the total size of the diary in bytes and the total no. of diary re
 NEW		creates a new record with current date and time, then allows to edit it
 COPY	copy record, if new record has same date&time as old, confirm replace with Y/N
 ANNIV	as copy, but with year+1
-DEL		delete current record, confirms with Y/N before deleting record
+DEL		delete current record, confirm with Y/N
 EDIT	edit current record (as COPY but old record deleted)
-FIND	search for text in records, like FIND from the Organiser top menu, a second selection turns find mode off
+FIND	search for text in records, like FIND from the Organiser top menu, a second selection turns find mode off, recalls find text from previous search
 MODE	changes record displayed after edit: either new edited record (new rec) or record prior to edit (old rec)
 BACK	move back to previous record
 ZAP		delete whole diary, all records! Use with caution! Asks to confirm Y/N, twice
