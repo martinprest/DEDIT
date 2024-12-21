@@ -11,6 +11,17 @@ Compatible with the main Organiser DIARY and Jaap's year 2000 fix.
 DEDIT can be used as an alternative to the main DIARY, although not all functions are reproduced.
 As a precaution, use the SAVE function of the main DIARY before installing DEDIT, and to periodically backup your diary!
 
+About DEDIT
+-----------
+DEDIT works a bit like the LIST option in the XP (or CM) DIARY, except that it allows to edit diary entries.
+Diary entries are referred to as records for DEDIT.
+Diary records are stored in a memory allocator cell in a similar format to database records in the A:MAIN database
+but different enough that OS calls are required to add or delete them.
+The OS calls used are: 
+al$grow - grows an allocator cell (from a given point)
+al$shrink - shrinks an allocator cell (from a given point)
+ut$cpyb - copies memory contents from one place to another (used to read/write diary entries to/from a string variable)
+
 Files
 -----
 DEDIT:					main program
@@ -41,8 +52,7 @@ FOR XP or CM only - The LZ Diary works differently
 Modification of the program may result in a system crash, and although I've been testing it, use with caution!
 
 Copy all files to a datapak or to A: using a CommsLink
-translate OPL on the organiser, or translate before transfer using
-OPLTRAN or ATRAN with the fils.trn list
+translate OPL on the organiser, or translate before transfer using OPLTRAN or ATRAN with the files.trn list
 Or build a pack using BLDPACK and the BUILD file and copy to a pack
 To use with Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG then RUN 
 and enter TIMEINST in A:, B: or C: as appropriate to install the Y2K fix.
@@ -51,20 +61,6 @@ and enter TIMEINST in A:, B: or C: as appropriate to install the Y2K fix.
 Set time using TIME on the Organiser main menu.
 Use MODE on the main menu to install DEDIT there, or use PROG, RUN, and enter DEDIT
 
-About DEDIT
------------
-DEDIT began as a couple of OPL functions to delete (DYdel) and add (DYadd) diary records, 
-then DYiadd was added to ensure records are added in chronological order
-
-DEDIT works a bit like the LIST option in the XP (or CM) DIARY, except that it allows to edit diary entries.
-Diary entries are stored in a memory allocator cell in a similar format to database records in the A:MAIN database
-but different enough that OS calls are required to add or delete them.
-The OS calls used are: 
-al$grow - grows an allocator cell (from a given point)
-al$shrink - shrinks an allocator cell (from a given point)
-ut$cpyb - copies memory contents from one place to another (used to read/write diary entries to/from a string variable)
-
-Diary entries are referred to as records for DEDIT.
 
 Using DEDIT
 -----------
