@@ -53,7 +53,7 @@ Modification of the program may result in a system crash, and although I've been
 
 Copy all files to a datapak or to A: using a CommsLink
 translate OPL on the organiser, or translate before transfer using OPLTRAN or ATRAN with the files.trn list
-Or build a pack using BLDPACK and the BUILD file and copy to a pack
+Or build a pack using BLDPACK and the DEDIT.BLD file and make a pack using orglink or similar.
 To use with Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG then RUN 
 and enter TIMEINST in A:, B: or C: as appropriate to install the Y2K fix.
 (TIMEINST uses POKCNV% to convert and poke the machine code)
@@ -91,6 +91,7 @@ EXE enters the text, then the alarm time can be edited (no. of minutes before th
 To choose an editing function, press MODE to get the options in a menu, or just press the 1st letter of the option (without the menu):
 r*/*,NEW,COPY,ANNIV,DEL,EDIT,FIND,MODE,BACK,ZAP,QUIT
 On/Clr can also be used to QUIT and return the the Organiser main menu.
+The DEL key selects the delete function.
 
 The 1st menu item is a record indicator showing the current record number and the total number of records, e.g.:
 r2/7 would be record 2 of a total of 7 records. Selecting this item will show 
