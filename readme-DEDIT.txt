@@ -5,7 +5,7 @@ Martin Prest, Dec-2024
 
 Introduction
 ------------
-An editor for diary entries, which lists them in ascending chronological order.
+A diary browser and editor, which lists entries in ascending chronological order.
 Provides functions such as: Edit, Delete and Find, plus Anniv for copying anniversaries to the following year.
 Compatible with the main Organiser DIARY and Jaap's year 2000 fix.
 DEDIT can be used as an alternative to the main DIARY, although not all functions are reproduced.
@@ -14,7 +14,8 @@ As a precaution, use the SAVE function of the main DIARY before installing DEDIT
 Files
 -----
 DEDIT:					main program
-FILES.BLD   build file listing files for BLDPACK to build a pack
+files.trn
+dedit.bld
 DEDIT_beta.opk   pack image with all the files
 DEDIT_beta.sna   XP 32K snap file for Jaap's Jape emulator for those who want to try it without having to run TIMEINST first
 DYsize:					OS call of diary allocator cell size
@@ -40,6 +41,8 @@ FOR XP or CM only - The LZ Diary works differently
 Modification of the program may result in a system crash, and although I've been testing it, use with caution!
 
 Copy all files to a datapak or to A: using a CommsLink
+translate OPL on the organiser, or translate before transfer using
+OPLTRAN or ATRAN with the fils.trn list
 Or build a pack using BLDPACK and the BUILD file and copy to a pack
 To use with Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG then RUN 
 and enter TIMEINST in A:, B: or C: as appropriate to install the Y2K fix.
