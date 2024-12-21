@@ -1,0 +1,181 @@
+Y2000FIX    Version 1.0
+~~~~~~~~
+by Jaap Scherphuis,  psion@jaapsch.net
+
+
+Description
+~~~~~~~~~~~
+
+This is a program which partially fixes the year 2000 problem on
+two line machines. It should work on all 2-line organisers.
+
+It is a TSR (ie a Terminate and Stay Resident program), meaning that after
+the OPL programs have finished a very small machine code program stays
+in memory, so that it can be called at any time.
+
+
+----------------------------------------------------------------------------
+
+Usage instructions
+~~~~~~~~~~~~~~~~~~
+
+When it is installed (see below) the main menu item TIME is redirected
+to the memory resident routine. This routine is identical to the normal
+one in ROM, except that it adds 84 to the year, making the range of the
+available years 1984 to 2083 instead of 1900 to 1999. This new range is
+chosen because these years have the same weekdays.
+
+The alarms, and most of the diary functions, do not display the year
+and are therefore not affected. The only diary function that still shows
+the old years is the GOTO option, displaying a date that is still 84 years
+behind.
+
+----------------------------------------------------------------------------
+
+Installation
+~~~~~~~~~~~~
+
+Load (or type in) and translate the programs TIMEINST and POKCNV%. Note
+that while POKCNV% is called POKCNV_.OPL on the PC, simply treat it as
+if it was called POKCNV% because the comms link automatically converts
+the '%' character.
+Run TIMEINST, and it will reserve some memory, install the TSR program
+there. It will then try to find the 'TIME' option in the main menu, and
+make it point to the new routine. If the 'TIME' option cannot be found
+(i.e. it has been removed or a foreign language menu) then the program
+is loaded but not activated.
+Both TIMEINST and POKCNV% can now be removed from memory as they are no
+longer necessary.
+
+
+If you are typing these programs into the Psion, be very careful that you
+have typed them in correctly and save them to a pak before attempting to
+run them. The program contains machine code, and any typing error can
+result in a system crash and hence the loss of all data on pack A:.
+
+
+Now the TSR is loaded, it does not need any OPL programs any more, however
+the following programs may still come in useful.
+
+
+Removal
+~~~~~~~
+Running the program TSRREMV will remove the TSR from memory, and reclaim
+the space it used. 
+To be a bit more precise, this procedure actually removes the TSR that was
+loaded last, provided it satisfies the critereria set out in the 'notes'
+section.
+
+
+
+Switching on and off
+~~~~~~~~~~~~~~~~~~~~
+If you run the program TIMEON, it will make the 'TIME' menu option point
+to the new TIME routine in RAM. If the menu option is not found, or if
+it has already been altered then nothing is done.
+
+If you run the program TIMEOFF, it will restore the 'TIME' menu option
+back to the standard ROM routine. If the menu option is not found, or if
+it has already been restored then nothing is done.
+
+
+
+Summary
+~~~~~~~
+
+The ZIP-file contains the following procedures:
+
+Installing the TSR:
+TIMEINST.OPL     Installs and activates the TSR program.
+POKCNV_.OPL      Standard program to poke hex in memory. Used by KEYINST.
+
+Aftercare for the TSR:
+TSRREMV.OPL      Removes a TSR from memory completely.
+TIMEON.OPL       Redirects the Time menu option to new routine.
+TIMEOFF.OPL      Restores the Time menu option back to ROM routine.
+
+----------------------------------------------------------------------------
+
+
+Problems
+~~~~~~~~
+If the TIME menu option is pointing to the new routine, and the menu
+option is deleted and re-inserted, the program assumes it is still
+active even though the option points to the standard ROM routine.
+Thus running TIMEON will not work, unless TIMEOFF is run first.
+
+On multi-lingual machines the month name is always in English, whatever
+the current language. The day name is however in the current language
+(because TM$DAYV is used).
+
+Take care with the following time related functions:
+  -the GOTO option in the diary menu
+  -the OPL functions DATIM$ and YEAR
+  -the system calls TM$TGET and TM$TUPDT
+All of these will return/use a year value that is 84 years less than the
+one shown in the new TIME routine.
+
+
+
+Disclaimer
+~~~~~~~~~~
+I have tried to make the programs as foolproof as I could, by implementing
+various checks in them. I believe that they should all work without
+problems on all organiser versions if used correctly, but I cannot be
+absolutely sure of this. I will not be held responsible for any problems
+caused directly or indirectly from your use of this program.
+
+There are other programs that work on similar principles to this one, and
+these may be incompatible. For example, the CUT program which is part of
+Widget software's Autoscribe will not work in combination with this
+program, due to a bug in their installation routine. 
+
+The TIME routine and its programs should work correctly in conjunction with
+any further TSR's that I may write in the future. In general however, the
+OPL programs in this package do not work if you install a TSR afterwards
+that does not conform to the specifications outlined below.
+
+----------------------------------------------------------------------------
+
+Notes
+~~~~~
+
+My thanks go to David Tarrant, who suggested the idea of simply
+re-calibrating the time clock. By doing so, this obviates the need to
+re-write the alarm routine, the diary routine, and the NMI handler.
+
+
+Space is created for the TSR by lowering the language stack top ($2065).
+Note that after lowering it, the installation overwrites the existing values
+on the stack, including the return address and variable space of the TIMEINST
+procedure. Therefore a number of tricks had to be used in TIMEINST:
+    The array Q%() is declared first so that other variables are
+      not affected by the pokes.
+    The program ends with the STOP command.
+
+This is also a major flaw in Bill Aitken's hexloader in his machine code
+book. If you use that program, make sure you stop the program after you
+lower the stack top, or insert STOP at the end of his SPACE procedure.
+
+
+The following features serve as a kind of standard for this and probably
+any TSR's I may write in the future.
+
+Let X denote the address where the TSR is loaded. The TSR code starts with
+the two characters "MR" (meaning Memory Resident) which all my future TSR's
+will have. This is followed by the characters "Tm", indicating the TIME
+program. Other TSR's will have other identifying characters here (eg 'Ky'
+for the KEYS program). Following these, at address X+4, is a word containing
+the amount of memory the TSR uses. A call to address X+6 activates the TSR,
+and a call to X+8 deactivates it. 
+
+----------------------------------------------------------------------------
+
+Version info
+~~~~~~~~~~~~
+
+Version 1.0, Size 456 bytes. 20/8/1998
+First version made available.
+
+-----------------------------------------------------------------------------
+Jaap's Psion II page:                           http://www.jaapsch.net/psion/
