@@ -64,12 +64,12 @@ Coding Flow
 
 translate, build and run using these 3 commands at the DOS prompt:
 atran @files -x
-makepack pack.bld
+makepack DEDIT.bld
 org2
 
-pack.bld example:
+DEDIT.bld example:
 PACK 32
-dyedit OB3 ! main proc
+dedit OB3 ! main proc
 dyread$ OB3 ! reads diary record
 dyadd OB3 ! adds a diary record
 

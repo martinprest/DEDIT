@@ -119,7 +119,7 @@ elseif k%=%C or mu%=3 rem C for * COPY
  pt$="COPY:" :goto edcpy::
 elseif k%=%A or mu%=4 rem A for * ANNIV
  pt$="ANN:" :goto anniv::
-elseif k%=%D or mu%=5 rem D for * DEL
+elseif k%=8 or k%=%D or mu%=5 rem D for * DEL
  goto delete::
 elseif k%=%E or mu%=6 rem E for * EDIT
  pt$="EDIT:" :goto edcpy::
