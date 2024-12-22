@@ -5,30 +5,18 @@ Martin Prest, Dec-2024
 
 Introduction
 ------------
-A diary browser and editor, which lists entries in ascending chronological order.
-Provides functions such as: Edit, Delete and Find, plus Anniv for copying anniversaries to the following year.
+A diary browser and editor, which lists entries in chronological order.
+Provides functions such as: Edit, Copy, Delete and Find.
 Compatible with the main Organiser DIARY and Jaap's year 2000 fix.
+DEDIT works a bit like the LIST option in the main DIARY, except that it allows to edit diary entries.
+
 DEDIT can be used as an alternative to the main DIARY, although not all functions are reproduced.
 As a precaution, use the SAVE function of the main DIARY before installing DEDIT, and to periodically backup your diary!
-
-About DEDIT
------------
-DEDIT works a bit like the LIST option in the XP (or CM) DIARY, except that it allows to edit diary entries.
 Diary entries are referred to as records for DEDIT.
-Diary records are stored in a memory allocator cell in a similar format to database records in the A:MAIN database
-but different enough that OS calls are required to add or delete them.
-The OS calls used are: 
-al$grow - grows an allocator cell (from a given point)
-al$shrink - shrinks an allocator cell (from a given point)
-ut$cpyb - copies memory contents from one place to another (used to read/write diary entries to/from a string variable)
 
 OPL Files
 -----
 DEDIT:					main program
-files.trn 				list of files to translate from opl to object ob3 files using opltran or atran
-dedit.bld 				same list of files, but as ob3 to make a pack using bldpack or makepack
-DEDIT_beta.opk   		pack image with all the files
-DEDIT_beta.sna   		XP 32K snap file for Jaap's Jape emulator for those who want to try it without having to run TIMEINST first
 DYsize:					OS call of diary allocator cell size
 DYnrecs:				gets total number of records (similar to DYsize, but uses PEEKB instead of OS call)
 DYread$:(dp%)			get diary record at dp%, end of diary returns null string (dp% is diary pointer, relative to diary start address)
@@ -48,15 +36,21 @@ Total size of OB3 object files: about 7.8 KB
 Other Files
 -----------
 
+DEDIT_beta.OPK   		pack image with all the files
+DEDIT_beta.sna   		XP 32K snap file for Jaap's Jape emulator for those who want to try it without having to run TIMEINST first
+FILES.TRN 				list of files to translate from OPL to object OB3 files using opltran or atran
+DEDIT.BLD 				same list of files, but as OB3 to make a pack using bldpack or makepack
+Y2000FIX.TXT			readme file for Jaap's Y2K fix.
+
 Install
 -------
 FOR XP or CM only - The LZ Diary works differently
 
 Modification of the program may result in a system crash, and although I've been testing it, use with caution!
 
-For evaluation purposes an OPK file is included for simpler installation, there is also a snapshot for Jaap's JAPE emulator.
+For simpler installation, an OPK file is included, there's also a snapshot for Jaap's JAPE emulator.
 Alternatively the software can be rebuilt from the OPL source code, by following the instructions below.
-Some additional software is required: the Organiser Developer, for translating and building packs. And some Comms Link software, such as OrgLink.
+Some additional software is required: The Organiser Developer, for translating and building packs. And some CommsLink software, such as OrgLink.
 
 Either:
 1. Copy all OPL files to a datapak or to A: using a CommsLink
@@ -64,7 +58,7 @@ Either:
 
 Or:
 1. Translate before transfer using OPLTRAN or ATRAN with the files.trn list
-2. Build a pack using BLDPACK and the DEDIT.BLD file and make a pack using orglink or similar.
+2. Build a pack using BLDPACK and the DEDIT.BLD file and make a pack using OrgLink or similar.
 
 Then:
 1. Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG, then RUN and enter TIMEINST
@@ -72,6 +66,8 @@ Then:
 (to remove, get TSRREMV from Jaap's website - y2000fix.zip, or reset the Psion)
 2. Set the time using TIME on the Organiser main menu.
 3. Use MODE on the main menu to install DEDIT there, or use PROG, RUN, and enter DEDIT
+
+Note: If TIMEINST is not installed, the year will not display correctly unless the Y2K variabes in the OPL source code are set to zero.
 
 Using DEDIT
 -----------
@@ -88,6 +84,8 @@ Keys
 ----
 EXE moves to the next record, or during FIND it will find the next match.
 UP & DOWN arrows move to first or last record, respectively.
+The DEL key selects the DEL function, to delete a record.
+On/Clr selects QUIT and exits DEDIT.
 
 During edit of date & time, arrow keys move left & right and up & down increase or decrease numbers on date & time, 
 or numbers can be entered on the keypad.
@@ -101,8 +99,6 @@ EXE enters the text, then the alarm time can be edited (no. of minutes before th
 
 To choose an editing function, press MODE to get the options in a menu, or just press the 1st letter of the option (without the menu):
 r*/*,NEW,COPY,ANNIV,DEL,EDIT,FIND,MODE,BACK,ZAP,QUIT
-On/Clr can also be used to QUIT and return the the Organiser main menu.
-The DEL key selects the delete function.
 
 The 1st menu item is a record indicator showing the current record number and the total number of records, e.g.:
 r2/7 would be record 2 of a total of 7 records. Selecting this item will show 
@@ -119,18 +115,29 @@ BACK	move back to previous record
 ZAP		delete whole diary, all records! Use with caution! Asks to confirm Y/N, twice
 QUIT	exit DEDIT
 
-note1:	BACK operates by returning to the 1st record, then scanning forwards to the previous record; this method is simple and reliable but slow.
-note2:	MODE set to "old rec" (see above) also scans the diary, so can be slow if the diary has a lot of records.
+Note 1:	BACK operates by returning to the 1st record, then scanning forwards to the previous record; this method is simple and reliable but slow.
+Note 2:	MODE set to "old rec" (see above) also scans the diary, so can be slow if the diary has a lot of records.
 
-The diary is held in what is called an "allocator cell" which is a reserved area of RAM.
+
+Allocator cells
+---------------
+
+The diary is held in an allocator cell which is a reserved area of RAM (DIRYCELL).
 There are a number of allocator cells and they can each be made bigger or smaller.
-The diary is the 3rd cell in the list, 1st is drivers such as COMMS and 2nd is a list of top menu entries.
+The diary is the 3rd cell in the list, 1st is drivers such as COMMS (PERMCELL) and 2nd is a list of top menu entries (MENUCELL).
+
+Diary records are stored in a similar format to database records in the A:MAIN database (The DATACELL)
+but different enough that OS calls are required to add or delete them.
+The OS calls used are: 
+al$grow - grows an allocator cell (from a given point)
+al$shrink - shrinks an allocator cell (from a given point)
+ut$cpyb - copies memory contents from one place to another (used to read/write diary entries to/from a string variable)
 
 Diary record structure
 ----------------------
 
 system variable:
-dirycell at memory location: $2004/05 is a pointer to the memory location of the Diary allocator cell. 
+DIRYCELL at memory location: $2004/05 is a pointer to the memory location of the Diary allocator cell. 
 
 Diary entries are listed sequentially in ascending date&time order.
 Each diary entry consists of 7 information bytes and the entry text:

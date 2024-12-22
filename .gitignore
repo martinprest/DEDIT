@@ -1,2 +1,6 @@
 *.OB3
-/old
+*.exe
+*.ini
+*.rom
+*.sav
+README_ORG2.TXT
