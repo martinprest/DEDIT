@@ -22,7 +22,7 @@ DYnrecs:				gets total number of records (similar to DYsize, but uses PEEKB inst
 DYread$:(dp%)			get diary record at dp%, end of diary returns null string (dp% is diary pointer, relative to diary start address)
 DYdel:(dp%,sz%)			delete a diary record at dp%, length sz%
 DYadd:(dp%,rec$)		add a diary record, rec$ at dp%
-DYiadd:(rec2$)			info add - add in correct place depending on info
+DYiadd:(rec2$)			info add - add in chronological order, depending on info
 DYinfo$:(rec$)			get info bytes from diary record
 DYedrec$:(rec$,pt$)		edit rec$ for new or replacement record, with prompt pt$
 DOW:(d%,m%,y%)			get day of week as no.0-6, with Sunday as 0
