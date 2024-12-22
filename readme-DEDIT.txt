@@ -93,7 +93,7 @@ Invalid date or time generates a "Bad Date or Time" error until date & time are 
 EXE confirms the date & time, then record text can be edited.
 On/Clr during date and time edit cancels the edit and returns to the record browser.
 
-During EDIT of record text (uses OPL command EDIT): UP goes to start, DOWN goes to end, On/Clr clears the text. 
+During editing of record text (uses OPL command EDIT): UP goes to start, DOWN goes to end, On/Clr clears the text. 
 On/Clr a second time returns the edit cursor to the time & date.
 EXE enters the text, then the alarm time can be edited (no. of minutes before the event time, max 59)
 
