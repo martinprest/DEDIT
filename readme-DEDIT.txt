@@ -67,7 +67,7 @@ Then:
 2. Set the time using TIME on the Organiser main menu.
 3. Use MODE on the main menu to install DEDIT there, or use PROG, RUN, and enter DEDIT
 
-Note: If TIMEINST is not installed, the year will not display correctly unless the Y2K variabes in the OPL source code are set to zero.
+Note: If TIMEINST is not installed, the year will not display correctly unless the Y2K% variables in the OPL source code are set to zero.
 
 Using DEDIT
 -----------
@@ -110,7 +110,7 @@ ANNIV	as copy, but with year+1
 DEL		delete current record, confirm with Y/N
 EDIT	edit current record (as COPY but old record deleted)
 FIND	search for text in records, like FIND from the Organiser top menu, a second selection turns find mode off, recalls find text from previous search
-MODE	changes record displayed after edit: either new edited record (new rec) or record prior to edit (old rec)
+MODE	inducates record displayed after edit: either new edited record (new rec) or record prior to edit (old rec), further presses of "m" will toggle the mode.
 BACK	move back to previous record
 ZAP		delete whole diary, all records! Use with caution! Asks to confirm Y/N, twice
 QUIT	exit DEDIT
