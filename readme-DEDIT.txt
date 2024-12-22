@@ -50,15 +50,15 @@ Modification of the program may result in a system crash, and although I've been
 
 For simpler installation, an OPK file is included, there's also a snapshot for Jaap's JAPE emulator.
 Alternatively the software can be rebuilt from the OPL source code, by following the instructions below.
-Some additional software is required: The Organiser Developer, for translating and building packs. And some CommsLink software, such as OrgLink.
+Some additional software is required: The Organiser Developer, for translating and building packs. And some CommsLink software, such as ORG-link.
 
 Either:
-1. Copy OPL files to a datapak or to A: using a CommsLink
+1. Transfer OPL files to a datapak or to A: using a CommsLink (I haven't tested this, the files might be too big unless the REM statements are removed first, using SQUEEZE or similar)
 2. Translate OPL on the organiser
 
 Or:
-1. Translate before transfer using OPLTRAN or ATRAN with the files.trn list
-2. Build a pack using BLDPACK and the DEDIT.BLD file and make a pack using OrgLink or similar.
+1. Translate before transfer using OPLTRAN or ATRAN with the FILES.TRN list
+2. Build a pack using BLDPACK and the DEDIT.BLD file and make a pack using ORG-link or similar.
 
 Then:
 1. Install Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG, then RUN and enter TIMEINST
