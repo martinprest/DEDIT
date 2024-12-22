@@ -22,7 +22,7 @@ al$grow - grows an allocator cell (from a given point)
 al$shrink - shrinks an allocator cell (from a given point)
 ut$cpyb - copies memory contents from one place to another (used to read/write diary entries to/from a string variable)
 
-Files
+OPL Files
 -----
 DEDIT:					main program
 files.trn 				list of files to translate from opl to object ob3 files using opltran or atran
@@ -45,22 +45,33 @@ TIMEINST:				Jaap's Y2K fix, uses POKCNV% to install terminate and stay resident
 
 Total size of OB3 object files: about 7.8 KB
 
+Other Files
+-----------
+
 Install
 -------
 FOR XP or CM only - The LZ Diary works differently
 
 Modification of the program may result in a system crash, and although I've been testing it, use with caution!
 
-Copy all files to a datapak or to A: using a CommsLink
-translate OPL on the organiser, or translate before transfer using OPLTRAN or ATRAN with the files.trn list
-Or build a pack using BLDPACK and the DEDIT.BLD file and make a pack using orglink or similar.
-To use with Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG then RUN 
-and enter TIMEINST in A:, B: or C: as appropriate to install the Y2K fix.
-(TIMEINST uses POKCNV% to convert and poke the machine code)
-(to remove get TSRREMV from Jaap's website - y2000fix.zip, or reset the Psion)
-Set time using TIME on the Organiser main menu.
-Use MODE on the main menu to install DEDIT there, or use PROG, RUN, and enter DEDIT
+For evaluation purposes an OPK file is included for simpler installation, there is also a snapshot for Jaap's JAPE emulator.
+Alternatively the software can be rebuilt from the OPL source code, by following the instructions below.
+Some additional software is required: the Organiser Developer, for translating and building packs. And some Comms Link software, such as OrgLink.
 
+Either:
+1. Copy all OPL files to a datapak or to A: using a CommsLink
+2. Translate OPL on the organiser
+
+Or:
+1. Translate before transfer using OPLTRAN or ATRAN with the files.trn list
+2. Build a pack using BLDPACK and the DEDIT.BLD file and make a pack using orglink or similar.
+
+Then:
+1. Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG, then RUN and enter TIMEINST
+(TIMEINST uses POKCNV% to convert and poke the machine code)
+(to remove, get TSRREMV from Jaap's website - y2000fix.zip, or reset the Psion)
+2. Set the time using TIME on the Organiser main menu.
+3. Use MODE on the main menu to install DEDIT there, or use PROG, RUN, and enter DEDIT
 
 Using DEDIT
 -----------
