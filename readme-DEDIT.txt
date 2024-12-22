@@ -53,7 +53,8 @@ Alternatively the software can be rebuilt from the OPL source code, by following
 Some additional software is required: The Organiser Developer, for translating and building packs. And some CommsLink software, such as ORG-link.
 
 Either:
-1. Transfer OPL files to a datapak or to A: using a CommsLink (I haven't tested this, the files might be too big unless the REM statements are removed first, using SQUEEZE or similar)
+1. Transfer OPL files to a datapak or to A: using a CommsLink.
+(I haven't tested this, the files might be too big unless the REM statements are removed first, using SCRUNCH or similar)
 2. Translate OPL on the organiser
 
 Or:
