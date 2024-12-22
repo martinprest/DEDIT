@@ -53,7 +53,7 @@ Alternatively the software can be rebuilt from the OPL source code, by following
 Some additional software is required: The Organiser Developer, for translating and building packs. And some CommsLink software, such as OrgLink.
 
 Either:
-1. Copy all OPL files to a datapak or to A: using a CommsLink
+1. Copy OPL files to a datapak or to A: using a CommsLink
 2. Translate OPL on the organiser
 
 Or:
@@ -61,7 +61,7 @@ Or:
 2. Build a pack using BLDPACK and the DEDIT.BLD file and make a pack using OrgLink or similar.
 
 Then:
-1. Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG, then RUN and enter TIMEINST
+1. Install Jaap's year 2000 bug fix, TIMEINST is included. From the Organiser main menu go to PROG, then RUN and enter TIMEINST
 (TIMEINST uses POKCNV% to convert and poke the machine code)
 (to remove, get TSRREMV from Jaap's website - y2000fix.zip, or reset the Psion)
 2. Set the time using TIME on the Organiser main menu.
