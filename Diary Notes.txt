@@ -50,7 +50,6 @@ You can open a saved diary file in Xfiles, and then find and update records in i
 You could also do this in OPL using the data file handling and string handling commands. There is a program in Chapter 8 which does this.
 
 
-
 Paul Robson Emulator
 --------------------
 
