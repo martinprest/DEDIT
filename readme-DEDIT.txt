@@ -88,8 +88,8 @@ UP & DOWN arrows move to first or last record, respectively.
 The DEL key selects the DEL function, to delete a record.
 On/Clr selects QUIT and exits DEDIT.
 
-During edit of date & time, arrow keys move left & right and up & down increase or decrease numbers on date & time, 
-or numbers can be entered on the keypad.
+During edit of date & time, arrow keys move left & right and up & down increase or decrease the numbers.
+Also, numbers can be entered on the keypad.
 Invalid date or time generates a "Bad Date or Time" error until date & time are corrected.
 EXE confirms the date & time, then record text can be edited.
 On/Clr during date and time edit cancels the edit and returns to the record browser.
