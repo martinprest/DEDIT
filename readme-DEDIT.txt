@@ -110,8 +110,8 @@ COPY	copy record, if new record has same date&time as old, confirm replace with 
 ANNIV	as copy, but with year+1
 DEL		delete current record, confirm with Y/N
 EDIT	edit current record (as COPY but old record deleted)
-FIND	search for text in records, like FIND from the Organiser top menu, a second selection turns find mode off, recalls find text from previous search
-MODE	inducates record displayed after edit: either new edited record (new rec) or record prior to edit (old rec), further presses of "m" will toggle the mode.
+FIND	search for text in records, like FIND from the Organiser top menu, a second selection turns find mode off. (repeat FINDs will recall the find text from the previous search)
+MODE	indicates record displayed after edit: either new edited record (new rec) or record prior to edit (old rec), further presses of "m" will toggle the mode.
 BACK	move back to previous record
 ZAP		delete whole diary, all records! Use with caution! Asks to confirm Y/N, twice
 QUIT	exit DEDIT
