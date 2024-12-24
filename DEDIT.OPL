@@ -132,7 +132,8 @@ elseif k%=%F or mu%=7 rem F for * FIND
   if fnd$<>"" 
    fnd%=1
    goto reset:: rem reset to 1st rec and find
-  endif 
+  endif
+  goto redisp::
  else
   fnd%=0 :goto disp:: rem disp to update fi$
  endif
