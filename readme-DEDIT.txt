@@ -76,7 +76,7 @@ On launch, the record browser displays the first record, which will be the oldes
 Records are displayed in the following format:
 ddDD-MM-YY HH:MM, where: dd=day, DD=date, MM=Month, YY=year, HH=hour, MM=minute
 Record text is displayed on the line below and will scroll if longer than 16 characters. 
-Max length for diary entries is 64 chars. If record has an alarm set, it is inducated as (A:xx) where x is the time in minutes for the alarm prior to the record time.
+Max length for diary entries is 64 chars. If record has an alarm set, it is indicated as (A:xx) where x is the time in minutes for the alarm prior to the record time.
 (uses OPL command VIEW) so left and right arrows stop or continue scrolling, as appropriate.
 FIND mode is indicated by a capital F between the date and time on the top line of the display. FIND mode ends when the end of the diary is reached.
 When an editing mode is selected (NEW, EDIT, COPY or ANNIV), the text prompt (2nd line) indicates the mode (ANNIV is displayed as ANN to save space on the screen).
